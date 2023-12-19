@@ -55,7 +55,11 @@ if (!/^\d{4}-\d{2}-\d{2}$/.test(basicDetails.dateOfBirth)){
   
   // Check if the selected date is more than 17 years ago from the current date
   if (selectedDate > new Date(currentDate.getFullYear() - maxAllowedAge, currentDate.getMonth(), currentDate.getDate())) {
+<<<<<<< HEAD
     newErrors.basicDetails.dateOfBirth = 'The Date of Birth should be at least 18 years ago.';
+=======
+    newErrors.basicDetails.dateOfBirth = 'The Date of Birth should be at least 17 years ago.';
+>>>>>>> 64fac094732425eb6781fb4b1d08d952d964fbab
   }
 }
 }
