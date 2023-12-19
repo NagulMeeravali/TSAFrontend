@@ -5,13 +5,17 @@ import 'jquery.cookie'; // Check if this is the correct path
 import 'metismenu';
 // import '../../scripts/dashboard-menu';
 import { useState, useEffect } from "react";
-
+import { useUserContext } from '../common/UserProvider';
+import { apiUrl } from '../../services/ApplicantAPIService';
+ 
 function ApplicantNavBar() {
+  const { user } = useUserContext();
+  const [imageSrc, setImageSrc] = useState('');
   useEffect(() => {
     // Your custom JavaScript code for hamburger icon
     $("#left-menu-btn").on("click", function(e) {
       e.preventDefault();
-
+ 
       if ($("body").hasClass("sidebar-enable") == true) {
         $("body").removeClass("sidebar-enable");
         $.cookie("isButtonActive", "0");
@@ -22,19 +26,32 @@ function ApplicantNavBar() {
       1400 <= $(window).width()
         ? $("body").toggleClass("show-job")
         : $("body").removeClass("show-job");
-
+ 
       var width = $(window).width();
       if (width < 1400) {
         $.cookie('isButtonActive', null);
       }
     });
-
+ 
     if ($.cookie("isButtonActive") == 1) {
       $("body").addClass("sidebar-enable show-job");
     }
-
-    // Your existing dashboard-menu.js code
-  }, []);
+   
+    fetch(`${apiUrl}/applicant-image/getphoto/${user.id}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
+      },
+    })
+      .then(response => response.blob()) // Use response.blob() instead of response.json()
+      .then(blob => {
+        const imageUrl = URL.createObjectURL(blob);
+        setImageSrc(imageUrl);
+      })
+      .catch(error => {
+        console.error('Error fetching image URL:', error);
+      });
+   
+  }, [user.id]);
   return (
     <div>
   <a id="scroll-top" />
@@ -112,11 +129,18 @@ function ApplicantNavBar() {
             <div className="header-ct-center"></div>
             <div className="header-ct-right">
               <div className="header-customize-item account">
-                <img src="../images/user/avatar/image-01.jpg" alt="" />
+              {/* <img src={imageSrc} alt="" /> */}
+              {imageSrc ? (
+                <img src={imageSrc} alt="" />
+   
+  ) : (
+    <img src="../images/user/avatar/image-01.jpg" alt="" />
+  )}
                 <div className="name">
                   <span className="icon-keyboard_arrow_down" />
                 </div>
                 <div className="sub-account">
+                  <h4>Welcome {user.username}</h4>
                   <div className="sub-account-item">
                     <a href="/applicant-update-profile">
                       <span className="icon-profile" /> Profile
@@ -127,11 +151,11 @@ function ApplicantNavBar() {
                       <span className="icon-change-passwords" /> Change Password
                     </a>
                   </div>
-                  <div className="sub-account-item">
+                  {/* <div className="sub-account-item">
                     <a href="/applicant-delete-profile">
                       <span className="icon-trash" /> Delete Profile
                     </a>
-                  </div>
+                  </div> */}
                   <div className="sub-account-item">
                     <a href="/logout">
                       <span className="icon-log-out" /> Log Out
@@ -182,28 +206,28 @@ function ApplicantNavBar() {
               <span className="dash-titles">Find Jobs</span>
             </Link>
           </li>
-
+ 
           <li>
             <Link to="/applicant-applied-jobs" className="tf-effect">
               <span className="icon-my-apply dash-icon"></span>
               <span className="dash-titles">My Applied</span>
             </Link>
           </li>
-
+ 
           <li>
             <Link to="/applicant-saved-jobs" className="tf-effect">
               <span className="icon-work dash-icon"></span>
               <span className="dash-titles">Saved Jobs</span>
             </Link>
           </li>
-
+ 
           <li>
             <Link to="/applicant-job-alerts" className="tf-effect">
               <span className="icon-bell1 dash-icon"></span>
               <span className="dash-titles">Job Alerts</span>
             </Link>
           </li>
-
+ 
           <li>
             <Link to="/applicant-resume" className="tf-effect">
               <span className="icon-chat dash-icon"></span>
@@ -216,12 +240,12 @@ function ApplicantNavBar() {
               <span className="dash-titles">Change password</span>
             </Link>
           </li>
-          <li>
+          {/* <li>
             <Link to="/applicant-delete-profile" className="tf-effect">
               <span className="icon-trash dash-icon"></span>
               <span className="dash-titles">Delete Profile</span>
             </Link>
-          </li>
+          </li> */}
           <li>
             <Link to="/logout" className="tf-effect">
               <span className="icon-log-out dash-icon"></span>
@@ -234,5 +258,5 @@ function ApplicantNavBar() {
 </div>
   )
 }
-
+ 
 export default ApplicantNavBar;
